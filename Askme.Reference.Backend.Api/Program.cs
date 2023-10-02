@@ -1,3 +1,5 @@
+using Askme.Reference.Backend.Api.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +8,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// todo: export to startup.cs
+builder.Services.AddScoped<IContactRepository,ContactRepository>();
 
 var app = builder.Build();
 

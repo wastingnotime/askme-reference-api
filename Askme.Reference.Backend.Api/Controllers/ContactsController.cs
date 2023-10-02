@@ -1,3 +1,4 @@
+using Askme.Reference.Backend.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Askme.Reference.Backend.Api.Controllers;
@@ -6,79 +7,73 @@ namespace Askme.Reference.Backend.Api.Controllers;
 [Route("[controller]")]
 public class ContactsController : ControllerBase
 {
+    private readonly IContactRepository _repository;
     private readonly ILogger<ContactsController> _logger;
-    private static IEnumerable<Contact> _memoryStore = Enumerable.Empty<Contact>();
 
-    public ContactsController(ILogger<ContactsController> logger)
+    public ContactsController(ILogger<ContactsController> logger, IContactRepository repository)
     {
         _logger = logger;
-        if (!_memoryStore.Any())
-            _memoryStore = _memoryStore.Append(new Contact
-            {
-                FirstName = "Albert",
-                LastName = "Einsten",
-                PhoneNumber = "1111-1111"
-            });
+        _repository = repository;
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public Task<IEnumerable<Contact>> Get() =>
-        Task.FromResult(_memoryStore.AsEnumerable());
+        _repository.All();
 
     [HttpGet("{id:length(36)}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public Task<ActionResult<Contact>> Get(string id)
+    public async Task<ActionResult<Contact>> Get(string id)
     {
-        var item = GetItem(id);
-        return Task.FromResult((ActionResult<Contact>)(item is null ? NotFound() : Ok(item)));
+        var item = await _repository.One(x => x.Id == id);
+        return item is null ? NotFound() : Ok(item);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public Task<IActionResult> Post(Contact value)
+    public async Task<IActionResult> Post(Contact value)
     {
-        _memoryStore = _memoryStore.Append(value);
-        return Task.FromResult(CreatedAtAction(nameof(Get), new { id = value.Id }, value) as IActionResult);
+        await _repository.Store(value);
+        return CreatedAtAction(nameof(Get), new { id = value.Id }, value);
     }
 
     [HttpPut("{id:length(36)}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<IActionResult> Update(Contact value, string id)
+    public async Task<IActionResult> Update(Contact value, string id)
     {
         if (!id.Equals(value.Id))
-            return Task.FromResult(ValidationProblem() as IActionResult); //ValidationProblem instead BadRequest to keep standard 
+            return ValidationProblem(); //ValidationProblem instead BadRequest to keep standard 
 
-        var item = GetItem(id);
+        var item = await _repository.One(x => x.Id == id);
         if (item is null)
-            return Task.FromResult(NotFound() as IActionResult);
+            return NotFound();
 
+        //TODO: repo? responsibility
         item.FirstName = value.FirstName;
         item.LastName = value.LastName;
         item.PhoneNumber = value.PhoneNumber;
 
-        return Task.FromResult(NoContent() as IActionResult);
+        await _repository.Store(item);
+
+        return NoContent();
     }
 
     [HttpDelete("{id:length(36)}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string id)
     {
-        var item = GetItem(id);
+        var item = await _repository.One(x => x.Id == id);
         if (item is null)
-            return Task.FromResult(NotFound() as IActionResult);
+            return NotFound();
 
-        _memoryStore = _memoryStore.Where(x => x.Id != item.Id);
+        await _repository.Delete(item);
 
-        return Task.FromResult(NoContent() as IActionResult);
+        return NoContent();
     }
-
-    private static Contact? GetItem(string id) => 
-        _memoryStore.FirstOrDefault(x => x.Id == id);
 }
