@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askme.Reference.Backend.Api", "Askme.Reference.Backend.Api\Askme.Reference.Backend.Api.csproj", "{70FF0072-96D1-4362-93A8-2A7859A31D10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Askme.Reference.Backend.Api.Test", "Askme.Reference.Backend.Api.Test\Askme.Reference.Backend.Api.Test.csproj", "{7980DA8B-6672-4B48-B19D-FE4125818D1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{70FF0072-96D1-4362-93A8-2A7859A31D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70FF0072-96D1-4362-93A8-2A7859A31D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70FF0072-96D1-4362-93A8-2A7859A31D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7980DA8B-6672-4B48-B19D-FE4125818D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7980DA8B-6672-4B48-B19D-FE4125818D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7980DA8B-6672-4B48-B19D-FE4125818D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7980DA8B-6672-4B48-B19D-FE4125818D1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
