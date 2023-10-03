@@ -13,10 +13,10 @@ public class ContactControllerTest
     {
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.All())
+            .Setup(x => x.AllAsync())
             .ReturnsAsync(Enumerable.Empty<Contact>());
 
-        var actual = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Get();
+        var actual = await new ContactsController(GetLoggerStub(), repositoryMock.Object).GetAsync();
 
         Assert.NotNull(actual);
         Assert.Empty(actual);
@@ -27,7 +27,7 @@ public class ContactControllerTest
     {
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.All())
+            .Setup(x => x.AllAsync())
             .ReturnsAsync(
                 new[]
                 {
@@ -35,7 +35,7 @@ public class ContactControllerTest
                     new Contact { FirstName = "Marie", LastName = "Curie", PhoneNumber = "1111-1111" }
                 });
 
-        var actual = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Get();
+        var actual = await new ContactsController(GetLoggerStub(), repositoryMock.Object).GetAsync();
 
         Assert.NotNull(actual);
         Assert.Equal(2, actual.Count());
@@ -48,7 +48,7 @@ public class ContactControllerTest
     {
         var repositoryMock = new Mock<IContactRepository>();
 
-        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Get(Guid.NewGuid().ToString());
+        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).GetAsync(Guid.NewGuid().ToString());
         
         Assert.IsType<NotFoundResult>(result.Result);
     }
@@ -60,10 +60,10 @@ public class ContactControllerTest
             { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.One(It.IsAny<Func<Contact,bool>>()))
+            .Setup(x => x.OneAsync(It.IsAny<Func<Contact,bool>>()))
             .ReturnsAsync(expected);
 
-        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Get(expected.Id);
+        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).GetAsync(expected.Id);
         var actual = ((OkObjectResult) result.Result).Value as Contact; //TODO: review type
 
         Assert.NotNull(actual);
@@ -81,10 +81,10 @@ public class ContactControllerTest
             { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.Delete(It.IsAny<Contact>()))
+            .Setup(x => x.DeleteAsync(It.IsAny<Contact>()))
             .Returns(Task.CompletedTask);
 
-        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Delete(sample.Id);
+        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).DeleteAsync(sample.Id);
 
         Assert.IsType<NotFoundResult>(result);
     }
@@ -96,13 +96,13 @@ public class ContactControllerTest
             { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.One(It.IsAny<Func<Contact,bool>>()))
+            .Setup(x => x.OneAsync(It.IsAny<Func<Contact,bool>>()))
             .ReturnsAsync(sample);
         repositoryMock
-            .Setup(x => x.Delete(It.IsAny<Contact>()))
+            .Setup(x => x.DeleteAsync(It.IsAny<Contact>()))
             .Returns(Task.CompletedTask);
 
-        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Delete(sample.Id);
+        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).DeleteAsync(sample.Id);
 
         Assert.IsType<NoContentResult>(result);
     }
@@ -120,10 +120,10 @@ public class ContactControllerTest
 
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.Store(expected))
+            .Setup(x => x.StoreAsync(expected))
             .Returns(Task.CompletedTask);
 
-        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Post(expected);
+        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).PostAsync(expected);
 
         Assert.IsType<CreatedAtActionResult>(result);
         //todo: verify id
@@ -140,7 +140,7 @@ public class ContactControllerTest
             { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.One(It.IsAny<Func<Contact,bool>>()))
+            .Setup(x => x.OneAsync(It.IsAny<Func<Contact,bool>>()))
             .ReturnsAsync(current);
     
         var changed =    current.Clone();
@@ -148,13 +148,13 @@ public class ContactControllerTest
         changed.LastName = "Oinstein";
         changed.PhoneNumber = "3333-4444";
     
-        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).Update(changed, changed.Id);
+        var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).UpdateAsync(changed, changed.Id);
         
         Assert.IsType<NoContentResult>(result);
 
-        repositoryMock.Verify( x=>x.One(It.IsAny<Func<Contact,bool>>()), Times.AtMostOnce());
+        repositoryMock.Verify( x=>x.OneAsync(It.IsAny<Func<Contact,bool>>()), Times.AtMostOnce());
         repositoryMock.Verify(
-            x => x.Store(
+            x => x.StoreAsync(
                 It.Is<Contact>(c =>
                 c.Id == changed.Id &&
                 c.FirstName == changed.FirstName &&

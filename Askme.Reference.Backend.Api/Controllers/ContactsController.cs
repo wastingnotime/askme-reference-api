@@ -18,37 +18,37 @@ public class ContactsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public Task<IEnumerable<Contact>> Get() =>
-        _repository.All();
+    public Task<IEnumerable<Contact>> GetAsync() =>
+        _repository.AllAsync();
 
     [HttpGet("{id:length(36)}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Contact>> Get(string id)
+    public async Task<ActionResult<Contact>> GetAsync(string id)
     {
-        var item = await _repository.One(x => x.Id == id);
+        var item = await _repository.OneAsync(x => x.Id == id);
         return item is null ? NotFound() : Ok(item);
     }
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Post(Contact value)
+    public async Task<IActionResult> PostAsync(Contact value)
     {
-        await _repository.Store(value);
-        return CreatedAtAction(nameof(Get), new { id = value.Id }, value);
+        await _repository.StoreAsync(value);
+        return CreatedAtAction(nameof(GetAsync), new { id = value.Id }, value);
     }
 
     [HttpPut("{id:length(36)}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(Contact value, string id)
+    public async Task<IActionResult> UpdateAsync(Contact value, string id)
     {
         if (!id.Equals(value.Id))
             return ValidationProblem(); //ValidationProblem instead BadRequest to keep standard 
 
-        var item = await _repository.One(x => x.Id == id);
+        var item = await _repository.OneAsync(x => x.Id == id);
         if (item is null)
             return NotFound();
 
@@ -57,7 +57,7 @@ public class ContactsController : ControllerBase
         item.LastName = value.LastName;
         item.PhoneNumber = value.PhoneNumber;
 
-        await _repository.Store(item);
+        await _repository.StoreAsync(item);
 
         return NoContent();
     }
@@ -66,13 +66,13 @@ public class ContactsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> DeleteAsync(string id)
     {
-        var item = await _repository.One(x => x.Id == id);
+        var item = await _repository.OneAsync(x => x.Id == id);
         if (item is null)
             return NotFound();
 
-        await _repository.Delete(item);
+        await _repository.DeleteAsync(item);
 
         return NoContent();
     }

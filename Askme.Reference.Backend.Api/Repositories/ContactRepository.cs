@@ -19,22 +19,22 @@ public class ContactRepository : IContactRepository
         }
     }
 
-    public Task<IEnumerable<Contact>> All()
+    public Task<IEnumerable<Contact>> AllAsync()
     {
         return Task.FromResult(_memoryStore.AsEnumerable());
     }
 
-    public Task<IEnumerable<Contact>> All(Func<Contact, bool> predicate)
+    public Task<IEnumerable<Contact>> AllAsync(Func<Contact, bool> predicate)
     {
         return Task.FromResult(_memoryStore.AsEnumerable().Where(predicate));
     }
 
-    public Task<Contact?> One(Func<Contact, bool> predicate)
+    public Task<Contact?> OneAsync(Func<Contact, bool> predicate)
     {
         return Task.FromResult(_memoryStore.AsEnumerable().FirstOrDefault(predicate));
     }
 
-    public Task Store(Contact contact)
+    public Task StoreAsync(Contact contact)
     {
         if (_memoryStore.AsEnumerable().Any(x => x.Id == contact.Id))
             return Task.CompletedTask;
@@ -43,7 +43,7 @@ public class ContactRepository : IContactRepository
         return Task.CompletedTask;
     }
 
-    public Task Delete(Contact contact)
+    public Task DeleteAsync(Contact contact)
     {
         _memoryStore = _memoryStore.Where(x => x.Id != contact.Id);
         return Task.CompletedTask;

@@ -1,14 +1,13 @@
 # askme-reference-api
 
+API reference implementation for askme projects 
 
 
-# references
-
+## stack
 * [aspnetcore-7.0](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/apis?view=aspnetcore-7.0)
-* xunit
+* [xunit](https://xunit.net/)
 * [moq](https://github.com/moq/moq4)
 
-# todo
-* rename async methods -> xxxxAsync
+## todo
 * use fluent assertions
 * use linq to moq
