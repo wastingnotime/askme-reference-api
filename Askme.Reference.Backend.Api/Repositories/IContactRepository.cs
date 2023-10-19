@@ -1,10 +1,13 @@
+using System.Linq.Expressions;
+using Askme.Reference.Backend.Api.Models;
+
 namespace Askme.Reference.Backend.Api.Repositories;
 
 public interface IContactRepository
 {
-    public Task<IEnumerable<Contact>> AllAsync();
-    public Task<IEnumerable<Contact>> AllAsync(Func<Contact, bool> predicate);
-    public Task<Contact?> OneAsync(Func<Contact, bool> predicate);
-    public Task StoreAsync(Contact contact);
-    public Task DeleteAsync(Contact contact);
+    Task<IEnumerable<Contact>> AllAsync();
+    Task<IEnumerable<Contact>> AllAsync(Expression<Func<Contact, bool>> expr);
+    Task<Contact> OneAsync(Expression<Func<Contact, bool>> expr);
+    Task StoreAsync(Contact contact);
+    Task DeleteAsync(Contact contact);
 }

@@ -1,3 +1,4 @@
+using Askme.Reference.Backend.Api.Models;
 using Askme.Reference.Backend.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,7 @@ public class ContactsController : ControllerBase
     public Task<IEnumerable<Contact>> GetAsync() =>
         _repository.AllAsync();
 
-    [HttpGet("{id:length(36)}")]
+    [HttpGet("{id:length(24)}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Contact>> GetAsync(string id)
@@ -39,7 +40,7 @@ public class ContactsController : ControllerBase
         return CreatedAtAction(nameof(GetAsync), new { id = value.Id }, value);
     }
 
-    [HttpPut("{id:length(36)}")]
+    [HttpPut("{id:length(24)}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,7 +53,7 @@ public class ContactsController : ControllerBase
         if (item is null)
             return NotFound();
 
-        //TODO: repo? responsibility
+        //transfer values
         item.FirstName = value.FirstName;
         item.LastName = value.LastName;
         item.PhoneNumber = value.PhoneNumber;
@@ -62,7 +63,7 @@ public class ContactsController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{id:length(36)}")]
+    [HttpDelete("{id:length(24)}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

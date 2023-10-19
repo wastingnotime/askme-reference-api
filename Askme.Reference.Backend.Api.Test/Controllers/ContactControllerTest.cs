@@ -1,7 +1,10 @@
+using System.Linq.Expressions;
 using Askme.Reference.Backend.Api.Controllers;
+using Askme.Reference.Backend.Api.Models;
 using Askme.Reference.Backend.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using Moq;
 
 namespace Askme.Reference.Backend.Api.Test.Controllers;
@@ -57,10 +60,10 @@ public class ContactControllerTest
     public async Task Can_get_one_contact()
     {
         var expected = new Contact
-            { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
+            { Id = ObjectId.GenerateNewId().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.OneAsync(It.IsAny<Func<Contact,bool>>()))
+            .Setup(x => x.OneAsync(It.IsAny<Expression<Func<Contact,bool>>>()))
             .ReturnsAsync(expected);
 
         var result = await new ContactsController(GetLoggerStub(), repositoryMock.Object).GetAsync(expected.Id);
@@ -78,7 +81,7 @@ public class ContactControllerTest
     public async Task Cannot_delete_a_contact_due_its_nonexistence()
     {
         var sample = new Contact
-            { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
+            { Id = ObjectId.GenerateNewId().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
             .Setup(x => x.DeleteAsync(It.IsAny<Contact>()))
@@ -93,10 +96,10 @@ public class ContactControllerTest
     public async Task Can_delete_a_contact()
     {
         var sample = new Contact
-            { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
+            { Id = ObjectId.GenerateNewId().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.OneAsync(It.IsAny<Func<Contact,bool>>()))
+            .Setup(x => x.OneAsync(It.IsAny<Expression<Func<Contact,bool>>>()))
             .ReturnsAsync(sample);
         repositoryMock
             .Setup(x => x.DeleteAsync(It.IsAny<Contact>()))
@@ -112,7 +115,7 @@ public class ContactControllerTest
     {
         var expected = new Contact
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = ObjectId.GenerateNewId().ToString(),
             FirstName = "Albert",
             LastName = "Einstein",
             PhoneNumber = "2222-1111"
@@ -137,10 +140,10 @@ public class ContactControllerTest
     public async Task Can_update_a_contact()
     {
         var current = new Contact
-            { Id = Guid.NewGuid().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
+            { Id =ObjectId.GenerateNewId().ToString(), FirstName = "Albert", LastName = "Einstein", PhoneNumber = "2222-1111" };
         var repositoryMock = new Mock<IContactRepository>();
         repositoryMock
-            .Setup(x => x.OneAsync(It.IsAny<Func<Contact,bool>>()))
+            .Setup(x => x.OneAsync(It.IsAny<Expression<Func<Contact,bool>>>()))
             .ReturnsAsync(current);
     
         var changed =    current.Clone();
@@ -152,7 +155,7 @@ public class ContactControllerTest
         
         Assert.IsType<NoContentResult>(result);
 
-        repositoryMock.Verify( x=>x.OneAsync(It.IsAny<Func<Contact,bool>>()), Times.AtMostOnce());
+        repositoryMock.Verify( x=>x.OneAsync(It.IsAny<Expression<Func<Contact,bool>>>()), Times.AtMostOnce());
         repositoryMock.Verify(
             x => x.StoreAsync(
                 It.Is<Contact>(c =>
